@@ -1,0 +1,124 @@
+.screenSize {
+    height:848px !important;
+    width:1440px !important;
+}
+.screenHeight {
+    min-height: 820px !important;
+}
+.themeBgColor {
+    background-color: #F69A6A4A !important;
+}
+.themeActiveColor {
+    background-color: #DF5A14;
+}
+.themeActiveFont {
+    color:#DF5A14;
+}
+
+.activeColor {
+    color:#F69A6A;
+}
+.fontStyle {
+    font-family: 'Montserrat', sans-serif bold !important;
+}
+.loginBgColor {
+    background-color: #F69A6A !important;
+}
+.xSmallText {
+    font-size: 10px !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+.smallText {
+    font-size: 12px !important;
+    font-family: 'Montserrat', sans-serif !important; 
+}
+.normalText {
+    font-size: 14px !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.mediumText {
+    font-size: 16px !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.bigText {
+    font-size: 16px !important;
+    font-family: 'Montserrat', sans-serif  !important;
+}
+
+.megaText {
+    font-size: 18px !important;
+    font-weight: bolder !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+.gigaText {
+    font-size: 28px !important;
+    font-weight: bolder !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.borderStyle{
+    border-radius: 1.25rem !important;
+}
+.borderColor {
+    border-color:#DF5A14 !important;
+    border-width: 0.15rem !important;
+}
+.lightBorderColor {
+    border-color:#F69A6A !important;
+    border-top-right-radius: 0.15rem !important;
+    border-width: 0.15rem !important;
+}
+
+.notificationHeight {
+    height: 300px;
+}
+.scrollStyle {
+    overflow: scroll !important;
+}
+
+.popupStyle {
+    left:113px !important;
+    
+}
+.bs-popover-auto[x-placement^=bottom]>.arrow, .bs-popover-bottom>.arrow {
+    left:110px !important; 
+    color: aliceblue !important;
+    border-color:#F69A6A !important;
+}
+
+.outLineButton {
+    background-color: white;
+    color: #F69A6A;
+    border: 2px solid #F69A6A; 
+     
+}
+.outLineButton:hover {
+    background-color: #F69A6A;
+    color:#fff;
+    border: 2px solid #fff;
+}
+hr.line {
+    border-top: 1px solid black !important;
+}
+
+.no-outline:focus {
+    outline: none !important;
+}
+.input-style {
+    border: 0 !important;
+}
+
+/** Used to place the content on top of img*/
+.dashboardStyle {
+    position: absolute !important;
+    top: 150px !important;
+    left: 235px !important;
+}
+
+.contentStyle {
+    position: absolute !important;
+    left: 200px !important;
+    top: 200px !important;
+}

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="103" height="103" viewBox="0 0 103 103">
+  <defs>
+    <filter id="Ellipse_32" x="0" y="0" width="103" height="103" filterUnits="userSpaceOnUse">
+      <feOffset input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feFlood flood-opacity="0.369"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="floatBtn" transform="translate(15 15)">
+    <g transform="matrix(1, 0, 0, 1, -15, -15)" filter="url(#Ellipse_32)">
+      <circle id="Ellipse_32-2" data-name="Ellipse 32" cx="36.5" cy="36.5" r="36.5" transform="translate(15 15)" fill="#df5a14"/>
+    </g>
+    <g id="Group_129" data-name="Group 129" transform="translate(31.377 16.649)">
+      <ellipse id="Ellipse_33" data-name="Ellipse 33" cx="5.5" cy="5" rx="5.5" ry="5" transform="translate(-0.377 0.351)" fill="#fff"/>
+      <circle id="Ellipse_34" data-name="Ellipse 34" cx="5.5" cy="5.5" r="5.5" transform="translate(-0.377 14.351)" fill="#fff"/>
+      <ellipse id="Ellipse_35" data-name="Ellipse 35" cx="5.5" cy="5" rx="5.5" ry="5" transform="translate(-0.377 29.351)" fill="#fff"/>
+    </g>
+  </g>
+</svg>
