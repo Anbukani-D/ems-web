@@ -1,0 +1,52 @@
+.rbc-month-header {
+    background-color: #F69A6A !important;
+    font-family: 'Montserrat', sans-serif !important;
+    color: #fff !important;
+    font-size: 20px !important;
+    padding: 10px !important;
+    margin-bottom: 10px !important;
+}
+.rbc-header {
+    border-bottom:0ch !important;
+
+}
+.rbc-toolbar-label {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 30px !important;
+    font-weight: bolder !important;
+}
+.rbc-toolbar {
+    justify-content: space-between !important;
+}
+.rbc-month-view {
+    border:0ch !important;
+}
+
+.rbc-toolbar .rbc-toolbar-label{
+    text-align:right !important;
+}
+.rbc-header + .rbc-header {
+    border-left: 0ch !important;
+}
+.rbc-today {
+    background-color: #fff;
+    
+}
+.rbc-month-row + .rbc-month-row{
+    border-top: 0ch !important;
+}
+.rbc-day-bg + .rbc-day-bg {
+    border-left: 0ch !important;
+    border: 1px solid #eee !important;
+    margin: 2px;
+}
+.rbc-date-cell {
+    margin: 2px;
+}
+.rbc-event, .rbc-day-slot .rbc-background-event{
+    background-color: transparent !important;
+}
+.rbc-event.rbc-selected, .rbc-day-slot .rbc-selected.rbc-background-event{
+    background-color: transparent !important;
+    
+}

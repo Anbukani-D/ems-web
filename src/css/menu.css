@@ -1,0 +1,101 @@
+.breadcrumb {
+    background-color: transparent !important;
+}
+.breadcrumb-item.active {
+    color: #DF5A14;
+}
+
+/**
+    Tab navigation styles
+*/
+
+.nav-tabs {
+    border-bottom:3px solid #DF5A14;
+    border-color:#F69A6A4A;
+}
+.nav-tabs .nav-link {
+    border:0ch;
+}
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+    color:#DF5A14 !important;
+    border-bottom:3px solid #DF5A14 !important;
+}
+a {
+    color:black !important;
+}
+
+/** ToolTip */
+
+.tooltip {
+    display:inline-block;
+    position:relative;
+    border-bottom:1px dotted #666;
+    text-align:left;
+}
+
+.tooltip .top {
+    min-width:200px; 
+    top:-20px;
+    left:50%;
+    transform:translate(-50%, -100%);
+    padding:10px 20px;
+    color:#444444;
+    background-color:#EEEEEE;
+    font-weight:normal;
+    font-size:13px;
+    border-radius:8px;
+    position:absolute;
+    z-index:99999999;
+    box-sizing:border-box;
+    box-shadow:0 1px 8px rgba(0,0,0,0.5);
+    display:none;
+}
+
+.tooltip:hover .top {
+    display:block;
+}
+
+.tooltip .top i {
+    position:absolute;
+    top:100%;
+    left:50%;
+    margin-left:-12px;
+    width:24px;
+    height:12px;
+    overflow:hidden;
+}
+
+.tooltip .top i::after {
+    content:'';
+    position:absolute;
+    width:12px;
+    height:12px;
+    left:50%;
+    transform:translate(-50%,-50%) rotate(45deg);
+    background-color:#EEEEEE;
+    box-shadow:0 1px 8px rgba(0,0,0,0.5);
+}
+
+/** Pro menu style **/
+.pro-sidebar .pro-menu > ul > .pro-sub-menu > .pro-inner-list-item{
+    background-color:white !important
+}
+.pro-sidebar {
+    color:black !important
+}
+.pro-sidebar .pro-menu.shaped .pro-menu-item > .pro-inner-item > .pro-icon-wrapper{
+    background-color: #ffffff !important;
+}
+.pro-sidebar .pro-menu .pro-menu-item > .pro-inner-item:hover {
+    color: #DF5A14 !important
+}
+
+.pro-sidebar.collapsed .pro-menu > ul > .pro-menu-item.pro-sub-menu > .pro-inner-list-item > .popper-inner{
+    background-color: #ffffff !important;
+    border: 1px solid #DF5A14 !important;
+}
+.popper-element[data-popper-placement^='right'] > .popper-arrow{
+    border-right:7px solid #DF5A14 !important;
+    border-left: none !important;
+}
+

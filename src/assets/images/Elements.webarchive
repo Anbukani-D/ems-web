@@ -1,0 +1,537 @@
+bplist00Ñ_WebMainResourceÕ	
+^WebResourceURL_WebResourceFrameName_WebResourceData_WebResourceMIMEType_WebResourceTextEncodingName_Bfile:///Users/anbukani/Desktop/Projects/web/src/common/Elements.jsPOAÃ<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">/* eslint-disable no-undef */
+/**
+ * Common Element for this projects
+ */
+import React, { useState, useEffect } from "react";
+import moment from "moment";
+import Nav from "react-bootstrap/Nav";
+import { Link } from "react-router-dom";
+import Modal from "react-bootstrap/Modal";
+import DatePicker from "react-datepicker";
+import Grid from "@material-ui/core/Grid";
+import Navbar from "react-bootstrap/Navbar";
+import DateFnsUtils from "@date-io/date-fns";
+import Spinner from "react-bootstrap/Spinner";
+import InputLabel from "@material-ui/core/InputLabel";
+import { Select, MenuItem, FormControl, TextField } from "@material-ui/core";
+import {
+    MuiPickersUtilsProvider,
+    KeyboardDatePicker,
+} from "@material-ui/pickers";
+import { Route, Redirect, useLocation } from "react-router-dom";
+import { editUserInformation } from "./apis/User";
+import Logo from "../media/images/logo.png";
+import AppConfig from "../models/AppConfig";
+import LeftMenu from "./LeftMenu/LeftMenu";
+import { observer } from "mobx-react";
+import Config from "../models/Config";
+import t from "../libraries/language";
+import { init } from "./apis/Auth";
+import User from "../models/User";
+import "../libraries/Global";
+import "../css/Common.css";
+import "../css/common/Elements.css";
+import "react-datepicker/dist/react-datepicker.css";
+import { SetLocalStorage } from "../libraries/LocalStorage";
+import Flags from "../media/flags";
+import "date-fns";
+
+export const Layout = (props) =&gt; {
+    return &lt;LeftMenu children={props.children} /&gt;;
+};
+
+export const HomeTopMenu = () =&gt; {
+    const [locale, setLocale] = useState(AppConfig.locale);
+    function changeLocal(event) {
+        event.preventDefault();
+        const locale = event.target.value;
+        setLocale(locale);
+        AppConfig.setLocale(locale);
+        SetLocalStorage("locale", locale, 15552000, false);
+        editUserInformation({ locale: locale.value });
+        return false;
+    }
+    let LanguageList = [];
+    const localeLists = global.localeList;
+    for (let i in localeLists) {
+        const countryCode = global.localeFlag[i].toLowerCase();
+        const opction = {
+            value: i,
+            label: (
+                &lt;div className="normalTextRegular"&gt;
+                    &lt;img
+                        src={Flags[countryCode]["src"]}
+                        alt={Flags[countryCode]["title"]}
+                        className="w-25 mr-1"
+                    /&gt;
+                    {global.localeList[i]}
+                &lt;/div&gt;
+            ),
+        };
+        LanguageList.push(opction);
+    }
+
+    return (
+        &lt;Navbar bg="white" expand="lg" className="shadow-sm"&gt;
+            &lt;Navbar.Brand href="/"&gt;
+                &lt;img
+                    className="d-inline-block align-top logo-style"
+                    alt={t("sbi_remit")}
+                    src={Logo}
+                /&gt;
+            &lt;/Navbar.Brand&gt;
+            &lt;Navbar.Toggle aria-controls="basic-navbar-nav" /&gt;
+            &lt;Navbar.Collapse
+                className="mr-auto myHomeMenu py-2"
+                id="basic-navbar-nav"
+            &gt;
+                &lt;Nav className="menuItems"&gt;
+                    &lt;Nav.Item className="pt-1 px-4 "&gt;
+                        &lt;FormControl&gt;
+                            &lt;Select
+                                id="headerLaunages"
+                                className="normalFontsize"
+                                value={locale}
+                                onChange={changeLocal}
+                                disableUnderline
+                            &gt;
+                                {LanguageList.map((item, index) =&gt; {
+                                    return (
+                                        &lt;MenuItem
+                                            key={index}
+                                            value={item.value}
+                                        &gt;
+                                            {item.label}
+                                        &lt;/MenuItem&gt;
+                                    );
+                                })}
+                            &lt;/Select&gt;
+                        &lt;/FormControl&gt;
+                    &lt;/Nav.Item&gt;
+                    &lt;Link to="/login" className="normalFontSize text-dark mr-4"&gt;
+                        &lt;span
+                            className="py-2 px-4 rounded"
+                            style={{ backgroundColor: Config.background_color }}
+                        &gt;
+                            {t("signin")}
+                        &lt;/span&gt;
+                    &lt;/Link&gt;
+                    &lt;Link
+                        className="normalFontSize text-white"
+                        to="/registration"
+                    &gt;
+                        &lt;span
+                            className="py-2 px-4 rounded"
+                            style={{ backgroundColor: Config.active_color }}
+                        &gt;
+                            {t("signup")}
+                        &lt;/span&gt;
+                    &lt;/Link&gt;
+                &lt;/Nav&gt;
+            &lt;/Navbar.Collapse&gt;
+        &lt;/Navbar&gt;
+    );
+};
+/**
+ *
+ * @param{props} route elements
+ * @returns page route
+ */
+export const PublicRoute = observer((props) =&gt; {
+    const [status, setStatus] = useState(false);
+    const [allow, setAllow] = useState(false);
+    const currentPath = useLocation();
+    const routes = ["/", "/login", "/registration"];
+    if (AppConfig.authorization &amp;&amp; routes.includes(currentPath.pathname)) {
+        return &lt;Redirect to="/home" /&gt;;
+    }
+    function UseEffectDidMount() {
+        useEffect(() =&gt; {
+            if (!Config.reHydrate &amp;&amp; !AppConfig.api_key &amp;&amp; !status) {
+                setStatus(true);
+                init().then((response) =&gt; {
+                    if (response &amp;&amp; response.status) {
+                        setStatus(false);
+                        setAllow(true);
+                    }
+                });
+            } else if (AppConfig.api_key) {
+                setAllow(true);
+            }
+        }, []);
+        return null;
+    }
+    function pageLoader() {
+        if (status) {
+            return (
+                &lt;Modal id="routeLoader" show={status}&gt;
+                    &lt;Spinner animation="border" variant="success" role="status"&gt;
+                        &lt;span className="sr-only"&gt;{t("loading")}&lt;/span&gt;
+                    &lt;/Spinner&gt;
+                &lt;/Modal&gt;
+            );
+        } else {
+            return null;
+        }
+    }
+    return (
+        &lt;&gt;
+            &lt;UseEffectDidMount /&gt;
+            {allow ? &lt;Route {...props} /&gt; : null}
+            {pageLoader()}
+        &lt;/&gt;
+    );
+});
+
+/**
+ *
+ * @param {*} route elements
+ * @returns square page route
+ */
+export const PrivateRoute = ({ component: Component, ...props }) =&gt; {
+    return (
+        &lt;Route
+            {...props}
+            render={(props) =&gt;
+                AppConfig.authorization !== "" ? (
+                    &lt;Component {...props} /&gt;
+                ) : (
+                    &lt;Redirect to="/login" /&gt;
+                )
+            }
+        /&gt;
+    );
+};
+
+export const CustomLabelInput = (props) =&gt; {
+    const { wapperClass, error, label, ...rest } = props;
+    return (
+        &lt;div className="inputBottom"&gt;
+            {label ? (
+                &lt;p className="smallTextMedium px-2  py-0 my-0"&gt;{label}&lt;/p&gt;
+            ) : null}
+            &lt;div className={"form-group py-0 my-0 " + wapperClass}&gt;
+                &lt;input className="smallTextMedium " {...rest} /&gt;
+            &lt;/div&gt;
+            {error ? (
+                &lt;span className="error text-danger ml-1 smallFontSize"&gt;
+                    {error}
+                &lt;/span&gt;
+            ) : null}
+        &lt;/div&gt;
+    );
+};
+
+export const CustomLabelSelect = (props) =&gt; {
+    const { wapperClass, error, label, ...rest } = props;
+    return (
+        &lt;div className="inputBottom"&gt;
+            {label ? (
+                &lt;p className="smallTextMedium px-2  py-0 my-0 "&gt;{label}&lt;/p&gt;
+            ) : null}
+            &lt;div className={wapperClass}&gt;
+                &lt;Select {...rest} /&gt;
+            &lt;/div&gt;
+            {error ? (
+                &lt;span className="error text-danger ml-1 smallFontSize"&gt;
+                    {error}
+                &lt;/span&gt;
+            ) : null}
+        &lt;/div&gt;
+    );
+};
+
+/**
+ *
+ *
+ */
+export const MaterialCustomInput = (props) =&gt; {
+  const { wapperClass,label, error, ...rest } = props;
+  return (
+    &lt;div&gt;
+      &lt;div&gt;
+        &lt;TextField
+            label={t(label)}
+            className="smallText" {...rest} /&gt;
+
+            {error ? (
+          &lt;span style={{marginTop: 15}} className="error text-danger ml-1 smallFontSize"&gt;{error}&lt;/span&gt;
+      ) : null}
+      &lt;/div&gt;
+
+    &lt;/div&gt;
+  );
+};
+
+
+
+export const CustomInput = (props) =&gt; {
+    const { wapperClass, error, ...rest } = props;
+    return (
+        &lt;div className="inputBottom"&gt;
+            &lt;div className={"form-group " + wapperClass}&gt;
+                &lt;input className="smallText" {...rest} /&gt;
+            &lt;/div&gt;
+            {error ? (
+                &lt;span className="error text-danger ml-1 smallFontSize"&gt;
+                    {error}
+                &lt;/span&gt;
+            ) : null}
+        &lt;/div&gt;
+    );
+};
+/**
+ * Custom Select
+ */
+export const MaterialCustomSelect = (props) =&gt; {
+  let { wapperClass, fieldClass, error, label, id, options, ...rest } = props;
+  wapperClass = wapperClass ? wapperClass : "";
+  fieldClass = fieldClass ? fieldClass : "";
+  const fillData = () =&gt; {
+      var rows = [];
+      rows.push(&lt;option aria-label="None" value="" /&gt;);
+      if (options) {
+          for (const [index, value] of options.entries()) {
+              rows.push(&lt;option key={index}&gt;{value.label}&lt;/option&gt;);
+          }
+          return &lt;&gt;{rows}&lt;/&gt;;
+      } else {
+          return null;
+      }
+  };
+  return (
+      &lt;div className={wapperClass}&gt;
+          &lt;FormControl  className="w-100"&gt;
+              &lt;InputLabel  htmlFor={id ? id : null}&gt;{label}&lt;/InputLabel&gt;
+              &lt;Select native&gt;{fillData()}&lt;/Select&gt;
+          &lt;/FormControl&gt;
+          {error ? (
+              &lt;small className="form-text xSmallText text-danger"&gt;
+                  {t(error)}
+              &lt;/small&gt;
+          ) : null}
+      &lt;/div&gt;
+  );
+};
+
+
+export const CustomSelect = (props) =&gt; {
+    const { wapperClass, error, ...rest } = props;
+    return (
+        &lt;div className="inputBottom"&gt;
+            &lt;div className={"form-group " + wapperClass}&gt;
+                &lt;Select {...rest} /&gt;
+            &lt;/div&gt;
+            {error ? (
+                &lt;span className="error text-danger ml-1 smallFontSize"&gt;
+                    {error}
+                &lt;/span&gt;
+            ) : null}
+        &lt;/div&gt;
+    );
+};
+
+/**
+ * Custom Date picker
+ */
+export const MaterialCustomDatePicker = (props) =&gt; {
+    let {
+        wrapperClass,
+        fieldClass,
+        error,
+        label,
+        id,
+        onChange,
+        value,
+        ...rest
+    } = props;
+    wrapperClass = wrapperClass ? wrapperClass : "";
+    fieldClass = fieldClass ? fieldClass : "";
+
+    return (
+        &lt;div className={ wrapperClass }&gt;
+            &lt;MuiPickersUtilsProvider utils={DateFnsUtils}&gt;
+                &lt;Grid container&gt;
+                    &lt;KeyboardDatePicker
+                        id={id}
+                        label={label}
+                        format="dd/MM/yyyy"
+                        value={value}
+                        onChange={(val) =&gt; {
+                            onChange(val);
+                        }}
+                        InputLabelProps={{
+                            shrink: value ? true : false,
+                        }}
+                        KeyboardButtonProps={{
+                            "aria-label": "change date",
+                            shrink: true,
+                        }}
+                        className="w-100"
+                        {...rest}
+                    /&gt;
+                &lt;/Grid&gt;
+            &lt;/MuiPickersUtilsProvider&gt;
+
+            {error ? (
+                &lt;small className="form-text xSmallText text-danger"&gt;
+                    {t(error)}
+                &lt;/small&gt;
+            ) : null}
+        &lt;/div&gt;
+    );
+};
+
+export const CustomDatePicker = (props) =&gt; {
+    const { wapperClass, error, label, ...rest } = props;
+    return (
+        &lt;div className="inputBottom"&gt;
+            {label ? (
+                &lt;p className="smallTextMedium px-2 pb-2  my-0 "&gt;{label}&lt;/p&gt;
+            ) : null}
+            &lt;div className={"" + wapperClass}&gt;
+                &lt;DatePicker
+                    {...rest}
+                    dateFormat="MM/dd/yyyy"
+                    peekNextMonth
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                /&gt;
+            &lt;/div&gt;
+            {error ? (
+                &lt;span className="error text-danger ml-1 smallFontSize"&gt;
+                    {error}
+                &lt;/span&gt;
+            ) : null}
+        &lt;/div&gt;
+    );
+};
+
+/**
+ *
+ * @param Error message
+ * @returns string
+ */
+export const RenderError = observer((props) =&gt; {
+    if (props.error) {
+        return (
+            &lt;div className="p-3 mb-2 bg-danger text-white"&gt;
+                {t(props.error)}
+            &lt;/div&gt;
+        );
+    } else {
+        return false;
+    }
+});
+
+/**
+ *
+ * @param title, loader, className
+ * @returns string
+ */
+export const RenderButton = observer(({ ...props }) =&gt; {
+    let className = "btn btn-primary";
+    if (props.className) {
+        className = "py-2 btn " + props.className;
+    }
+    if (props.loading) {
+        return (
+            &lt;button
+                className={className}
+                style={{
+                    backgroundColor: Config.active_color,
+                    borderColor: Config.active_color,
+                }}
+                type="button"
+                disabled
+            &gt;
+                &lt;span
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                &gt;&lt;/span&gt;
+                {t("loading")}
+            &lt;/button&gt;
+        );
+    } else {
+        return (
+            &lt;button
+                type="submit"
+                style={{
+                    backgroundColor: Config.active_color,
+                    borderColor: Config.active_color,
+                }}
+                className={className}
+            &gt;
+                {t(props.title)}
+            &lt;/button&gt;
+        );
+    }
+});
+
+/**
+ *
+ *
+ *
+ */
+export const CounterDown = ({ ...props }) =&gt; {
+    const calculateTimeLeft = () =&gt; {
+        const now = moment();
+        const downTime = moment(props.timeLeft);
+        // const difference = moment(downTime - now);
+        const difference = moment.duration(downTime - now, "milliseconds");
+        let timeLeft = {};
+
+        if (difference &gt; 0) {
+            timeLeft = {
+                days: difference.days(),
+                hours: difference.hours(),
+                minutes: difference.minutes(),
+                seconds: difference.seconds(),
+            };
+        }
+        return timeLeft;
+    };
+    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+    const timerComponents = [];
+
+    Object.keys(timeLeft).forEach((interval, index) =&gt; {
+        if (!timeLeft[interval]) {
+            return;
+        }
+
+        timerComponents.push(
+            &lt;span key={index}&gt;
+                {timeLeft[interval]} {interval}{" "}
+            &lt;/span&gt;
+        );
+    });
+
+    useEffect(() =&gt; {
+        if (timerComponents.length !== 0) {
+            setTimeout(() =&gt; {
+                setTimeLeft(calculateTimeLeft());
+            }, 1000);
+        } else {
+            return;
+        }
+    });
+
+    props.getValue(timerComponents);
+
+    if (timerComponents.length) {
+        return &lt;div&gt;{timerComponents}&lt;/div&gt;;
+    } else {
+        return false;
+    }
+};
+
+export const Logout = () =&gt; {
+    AppConfig.clearStore();
+    User.clearStore();
+    return &lt;Redirect to="/login" /&gt;;
+};
+</pre></body></html>_text/javascriptUUTF-8    ( 7 N ` v ” Ù ÚB¡B³                           B¹
