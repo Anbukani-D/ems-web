@@ -1,20 +1,17 @@
-// Careers Page
+// Careers Description Page
 // 18-02-2021
 
 import React from 'react';
 import "../../../css/common.css";
 import {Layout} from "../../../common/Components";
-import ApplyLeave from '../../general/ApplyLeave';
-
 import moment from 'moment';
 import Icomoon from '../../../libraries/Icomoon';
 
-
 class CareersDescription extends React.Component {
-
     state={
         jobContent:[ ]
     }
+
     componentDidMount() {
 		let jobContent = [
 			{
@@ -84,33 +81,28 @@ class CareersDescription extends React.Component {
 
     render() {
         return (
-            <Layout back="Admin" current="Careers">
+            <Layout back="HR Management" current="Careers" pageTitle="Job Description" >
                 <div className="container-fluid">
-                    <div className="row mx-2 mt-3">
+                    <div className="row mx-2">
                         <div className="col-md-3 mt-4">
                             {this.renderCareersView()}
                         </div>
                         <div className="col-md-7">
                             <div className='col-md-12 d-flex justify-content-between'>
                                 <div>
-                                    <Icomoon icon="previous" size={13}/>
-                                    <span className="smallText px-3 text-secondary">Previous</span>
+                                    <Icomoon className="pointer" icon="previous" size={13} onClick={()=>this.props.history.goBack()}/>
+                                    <span className="smallText px-3 text-secondary pointer">Previous</span>
                                 </div>
                                 <div>
-                                <span className="smallText px-3">Next</span>
-                                    <Icomoon icon="next" size={13}/>
-                                    
-                                </div>
-                                
+                                <span className="smallText px-3 pointer">Next</span>
+                                    <Icomoon className="pointer" icon="next" size={13}/>
+                                </div>  
                             </div>
                             {this.renderCareersDescription()}
                         </div>
                         <div className="col-md-2 mt-4">
                             {this.renderSimilarJobs()}
                         </div>
-                    </div>
-                    <div className="d-flex justify-content-end">
-                        <ApplyLeave/>
                     </div>
                 </div>          
             </Layout>
@@ -121,7 +113,7 @@ class CareersDescription extends React.Component {
 
     renderCareersView() {
         return(
-            <div className="bg-white p-4 borderStyle" style={{height:620}}>
+            <div className="bg-white p-4 borderStyle" style={{height:540}}>
                 <div key={this.state.id}>
                     <h5 className="fontStyle themeActiveFont">{this.state.designation ? this.state.designation:'UI/UX Designer'}</h5> 
                     <p className="smallText text-dark">{this.state.company? this.state.company:'Aiknow Labs'}, 
@@ -142,7 +134,7 @@ class CareersDescription extends React.Component {
                             {this.state.staffingArea ? this.state.staffingArea :'Creative & Marketing'}
                         </p>
                     </div>
-                    <p className="xSmallText text-secondary mt-5 pt-5">Questions?</p>
+                    <p className="xSmallText text-secondary">Questions?</p>
                         <p className="smallText">
                             <span className="themeActiveFont">Call us at our branch office at</span><br/>
                             03930-0011693125
@@ -157,7 +149,7 @@ class CareersDescription extends React.Component {
      renderCareersDescription() {
         return(
             <>
-            <div className="bg-white p-4 borderStyle scrollStyle" style={{height:620}}>
+            <div className="bg-white p-4 borderStyle scrollStyle" style={{height:540}}>
                 <p className="smallText">
                     <span className="themeActiveFont">Description</span><br/>
                     {this.state.description ? this.state.description :'There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which dont look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isnt anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which dont look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isnt anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.'}
@@ -180,7 +172,7 @@ class CareersDescription extends React.Component {
     renderSimilarJobs(){
         return(
             <>
-            <div className="borderStyle bg-white p-3 scrollStyle" style={{height:620}}>
+            <div className="borderStyle bg-white p-3 scrollStyle" style={{height:540}}>
                 {this.state.jobContent.map((jobContent) => (
                     <div key={jobContent.id}>
                         <h6 className="fontStyle themeActiveFont">{jobContent.designation}</h6> 
@@ -191,25 +183,13 @@ class CareersDescription extends React.Component {
                         </p>
                         <p className="themeActiveFont xSmallText">{moment(jobContent.date).format('DD-MM-YYYY HH:mm:ss a')}</p>
                         <hr/>
-
-                    </div>  
-                    
-                ))
-                }  
+                    </div>      
+                ))}  
                 </div>              
             </>
         )
     }
-
-    
 }
-    
-
- 
-
-    
-    
-
 export default CareersDescription;
 
     

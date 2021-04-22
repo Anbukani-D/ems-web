@@ -1,15 +1,18 @@
-// Careers Page
+// Create job post modal
 // 18-02-2021
 
 import React from 'react';
 import "../../../css/common.css";
-import { ThemeButton, CustomInput, CustomSelect,  CustomDatePicker, ProgressBar} from "../../../common/Components";
-import {CheckUserName, CheckDob, DropDownCheck, CheckAddress, CheckAmount} from "../../../common/Validation";
+import { ThemeButton, CustomInput, CustomSelect,  CustomDatePicker} from "../../../common/Components";
+import {CheckUserName, CheckDob, DropDownCheck, CheckAddress, CheckAmount, CheckPincode} from "../../../common/Validation";
 import Modal from 'react-bootstrap/Modal'
 import Icomoon from '../../../libraries/Icomoon';
-import { jobTypeOptions, specializationOptions, locationOptions, durationOptions } from '../../../common/DropDownList';
+import { jobTypeOptions, durationOptions } from '../../../common/DropDownList';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import {createCareer} from '../../../common/Apis/hr/Career';
+import LoadingBar from 'react-top-loading-bar'
+
 
 class CreateJobPost extends React.Component {
     state={
@@ -26,12 +29,18 @@ class CreateJobPost extends React.Component {
         date:null,
         createJobPostModal:false,
         editorModal:false,
+        progress:''
     }
 
     render() {
         return (
             <>
-                <ThemeButton wrapperClass="btn themeActiveColor text-white col-md-1 fontStyle ml-5 py-2 smallText" label="Post Job" onClick={()=>{this.setState({createJobPostModal:true})}}/>
+                <LoadingBar
+                    color='#DF5A14'
+                    progress={this.state.progress}
+                    onLoaderFinished={() => this.setState({progress:100})}
+                />
+                <ThemeButton wrapperClass="btn themeActiveColor text-white px-5  fontStyle ml-2 smallText" label="Post Job" onClick={()=>{this.setState({createJobPostModal:true})}}/>
                 {this.renderCreateJobPostModal()}
                 {this.renderEditorModal()}
             </>
@@ -49,11 +58,14 @@ class CreateJobPost extends React.Component {
                 show={this.state.createJobPostModal}
             >    
                 <div className="m-3">
-                    <div className="d-flex justify-content-between p-3">
-                        <h3 className="fontStyle themeActiveFont">Create Job Post</h3>
+                    <div className="d-flex justify-content-between border-bottom colorBorder  mx-3">
+                        <div className="underLineStyle">
+                            <span className="fontStyle themeActiveFont gigaText font-weight-bold ">
+                                Create Job Post
+                            </span>
+                        </div>
                         <Icomoon style={{cursor:'pointer'}} icon="close" size={20} onClick={()=>{this.setState({createJobPostModal:false})}}/>
                     </div>
-                    <ProgressBar/>
                     <Modal.Body>
                         <form onSubmit={this.onSubmitJobPost}>
                             <CustomInput  
@@ -67,6 +79,7 @@ class CreateJobPost extends React.Component {
                                         jobTitleErr: '',
                                     })
                                 }
+                                error
                             />
                              <div className="mt-3">
                                 <CustomInput  
@@ -80,22 +93,7 @@ class CreateJobPost extends React.Component {
                                             companyNameErr: '',
                                         })
                                     }
-                                />
-                            </div>
-                            <div className="mt-3">
-                                <CustomInput  
-                                    placeholder="Job Description*" 
-                                    value={this.state.jobDescription}
-                                    onChange={(e)=>this.setState({jobDescription:e.target.value})}
-                                    customError={this.state.jobDescriptionErr}
-                                    onBlur = {() => this.validateJobDescription()}
-                                    multiline
-                                    rows={4}
-                                    onFocus={() =>
-                                        this.setState({
-                                            jobDescriptionErr: '',
-                                        })
-                                    }
+                                    error
                                 />
                             </div>
                             <div className="mt-3">
@@ -103,30 +101,32 @@ class CreateJobPost extends React.Component {
                                     placeholder="Job Type*"
                                     value={this.state.jobType}
                                     options ={ jobTypeOptions }
-                                    onChange = {this.jobTypeHandleChange}
-                                    onBlur = {() => this.validateJobType()}
+                                    onChange={(e)=> this.setState({jobType:e.target.value})}
+                                    // onBlur = {() => this.validateJobType()}
                                     customError={this.state.jobTypeErr}
                                     onFocus={() =>
                                         this.setState({
                                             jobTypeErr: '',
                                         })
-                                    }   
+                                    } 
+                                    error  
                                 />
                             </div>
                             <div className="mt-3">
-                                    <CustomInput  
-                                        placeholder="Address*" 
-                                        value={this.state.address}
-                                        onChange={(e)=>this.setState({address:e.target.value})}
-                                        customError={this.state.addressErr}
-                                        onBlur = {() => this.validateAddress()}
-                                        onFocus={() =>
-                                            this.setState({
-                                                addressErr: '',
-                                            })
-                                        }
-                                    />
-                                </div>
+                                <CustomInput  
+                                    placeholder="Address*" 
+                                    value={this.state.address}
+                                    onChange={(e)=>this.setState({address:e.target.value})}
+                                    customError={this.state.addressErr}
+                                    onBlur = {() => this.validateAddress()}
+                                    onFocus={() =>
+                                        this.setState({
+                                            addressErr: '',
+                                        })
+                                    }
+                                    error
+                                />
+                            </div>
                             <div className="row mt-3">
                                 <div className="col-md-4">
                                     <CustomInput  
@@ -140,6 +140,7 @@ class CreateJobPost extends React.Component {
                                                 cityErr: '',
                                             })
                                         }
+                                        error
                                     />
                                 </div>
                                 <div className="col-md-4">
@@ -154,6 +155,7 @@ class CreateJobPost extends React.Component {
                                                 stateErr: '',
                                             })
                                         }
+                                        error
                                     />
                                 </div>
                                 <div className="col-md-4">
@@ -168,6 +170,7 @@ class CreateJobPost extends React.Component {
                                                 stateErr: '',
                                             })
                                         }
+                                        error
                                     />
                                 </div>
                             </div>
@@ -184,6 +187,7 @@ class CreateJobPost extends React.Component {
                                                 salaryErr: '',
                                             })
                                         }
+                                        error
                                     />
                                 </div>
                                 <div className="col-md-4">
@@ -191,14 +195,15 @@ class CreateJobPost extends React.Component {
                                         placeholder="Hourly"
                                         value={this.state.duration}
                                         options ={ durationOptions }
-                                        onChange = {this.durationHandleChange}
-                                        onBlur = {() => this.validateduration()}
+                                        onChange={(e)=> this.setState({duration:e.target.value})}
+                                        // onBlur = {() => this.validateDuration()}
                                         customError={this.state.durationErr}
                                         onFocus={() =>
                                             this.setState({
                                                 durationErr: '',
                                             })
-                                        }    
+                                        } 
+                                        error   
                                     />
                                 </div>
                             </div>
@@ -213,9 +218,9 @@ class CreateJobPost extends React.Component {
                                     onSelect={this.dateHandleChange}
                                     onBlur = {() => this.validateDate()}
                                     customError={this.state.dateErr}
+                                    error
                                 />
                             </div>
-                            <p>{this.state.joiningDate}</p>
                             <div className="d-flex justify-content-between">
                                 <ThemeButton type="button" wrapperClass="btn outLineButton col-md-5 fontStyle mt-3 py-2 megaText" label="Cancel" onClick={()=>{this.setState({createJobPostModal:false})}}/>
                                 <ThemeButton type="submit" wrapperClass="btn themeActiveColor text-white col-md-5 fontStyle mt-3 py-2 megaText" label="Next"/>
@@ -241,8 +246,6 @@ class CreateJobPost extends React.Component {
                     <div className="d-flex justify-content-end p-3">
                         <Icomoon style={{cursor:'pointer'}} icon="close" size={20} onClick={()=>{this.setState({editorModal:false})}}/>
                     </div>
-                    <ProgressBar/>
-                    
                     <Modal.Body>
                         <form onSubmit={this.onSubmitEditor}>
                             <div className="mt-3">
@@ -250,6 +253,7 @@ class CreateJobPost extends React.Component {
                                     Description
                                 </span>
                                 <CKEditor
+                                    // value={this.state.jobDescription}
                                     editor={ ClassicEditor }
                                     data="<p>Job Description...*</p>"
                                     onReady={ editor => {
@@ -273,6 +277,7 @@ class CreateJobPost extends React.Component {
                                     Requirements
                                 </span>
                                 <CKEditor
+                                    // value={this.state.jobRequirement}
                                     editor={ ClassicEditor }
                                     data="<p>Job Requirements...*</p>"
                                     onReady={ editor => {
@@ -296,6 +301,7 @@ class CreateJobPost extends React.Component {
                                     About Company
                                 </span>
                                 <CKEditor
+                                    //  value={this.state.aboutCompany}
                                     editor={ ClassicEditor }
                                     data="<p>About Company...*</p>"
                                     onReady={ editor => {
@@ -412,18 +418,68 @@ class CreateJobPost extends React.Component {
         } else return true;
     };
 
-    // Empty user input validation 
+    // Validation for city
+    validateCity =() => {
+        const cityError = CheckUserName(this.state.city);
+        if (cityError === 1) {
+            this.setState({ cityErr: 'City empty' });
+            return false;
+        } else if (cityError === 2) {
+            this.setState({ cityErr: 'Invalid city' });
+            return false;
+        } else return true;
+    }
+
+    // Validation for state
+    validateState =() => {
+        const stateError = CheckUserName(this.state.state);
+        if (stateError === 1) {
+            this.setState({ stateErr: 'State empty' });
+            return false;
+        } else if (stateError === 2) {
+            this.setState({ stateErr: 'Invalid State ' });
+            return false;
+        } else return true;
+    }
+
+     // Validation for pincode
+     validatePincode =() => {
+        const pincodeError = CheckPincode(this.state.pincode);
+        if (pincodeError === 1) {
+            this.setState({ pincodeErr: 'Pincode  empty' });
+            return false;
+        } else if (pincodeError === 2) {
+            this.setState({ pincodeErr: 'Invalid State name' });
+            return false;
+        } else return true;
+    }
+
+    // Validation for from duration
+    validateDuration = () => {
+        const durationError = DropDownCheck(this.state.duration);
+        if (durationError === 1) {
+            this.setState({ durationErr: 'Duration empty' });
+            return false;
+        } else return true;
+    };
+
+    // Empty job post input validation 
     ValidateAllJobPost = ( ) => {
         const jobTitleInput = this.validateJobTitle();
         const companyNameInput = this.validateCompanyName();
         const jobDescriptionInput = this.validateJobDescription();
         const addressInput = this.validateAddress();
-        // const jobTypeInput = this.validateJobType();
+        const jobTypeInput = this.validateJobType();
         const salaryInput = this.validateSalary();
         const dateInput = this.validateDate();
+        const cityInput = this.validateCity();
+        const stateInput = this.validateState();
+        const pincodeInput = this.validatePincode();
+        const durationInput = this.validateDuration();
+
 
         console.log('validation',jobTitleInput, companyNameInput, jobDescriptionInput , addressInput ,salaryInput,  dateInput  )
-        if (jobTitleInput && companyNameInput && jobDescriptionInput && addressInput  && salaryInput && dateInput) {
+        if (jobTitleInput && companyNameInput && jobTypeInput && addressInput  && salaryInput && dateInput, cityInput, stateInput, pincodeInput, durationInput) {
             return true;
         } else {
             return false;   
@@ -432,14 +488,45 @@ class CreateJobPost extends React.Component {
 
     // onsubmit function for create job post inputs
 
-    onSubmitJobPost = (e) =>{
-        console.log('here');
+    onSubmitJobPost = (e) => {
         e.preventDefault();
         const allValidation = this.ValidateAllJobPost()
-            if (allValidation) {
-                this.setState({createJobPostModal:false, editorModal:true})
-            } 
+        if (allValidation) {
+            this.setState({createJobPostModal:false, editorModal:true})
+        }
+    }
+
+    onSubmitEditor = async(e) =>{
+        console.log('here hello')
+        e.preventDefault();
+        const allValidation = this.ValidateAllJobPost()
+            if (allValidation) {  
+                let requestBody = {
+                    jobTitle: this.state.jobTitle,
+                    date:this.state.date,
+                    companyName:this.state.companyName,
+                    jobDescription:this.state.jobDescription,
+                    jobType:this.state.jobType,
+                    address:this.state.address,
+                    city:this.state.city,
+                    state:this.state.state,
+                    pincode:this.state.pincode,
+                    duration:this.state.duration,
+                    salary:this.state.salary,
+                    aboutCompany:this.state.aboutCompany,
+                    jobRequirement:this.state.jobRequirement
+                };
+            let result = false
+            result = await createCareer(requestBody);
             
+            this.setState({progress:100,
+                // error:result.errorCode ? result.errorCode : result.message
+            });
+            if (result && result.status) {
+                alert('Job Posted Successfully! ')
+                this.props.history.push('/career');
+            } 
+        }       
     } 
 }
 export default CreateJobPost;

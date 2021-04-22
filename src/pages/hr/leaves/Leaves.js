@@ -4,15 +4,18 @@
 import React from 'react';
 import "../../../css/common.css";
 import { Layout, ThemeButton, CustomInput} from '../../../common/Components';
-import ApplyLeave from '../../general/ApplyLeave';
+import { CheckUserName } from "../../../common/Validation";
 import Icomoon from '../../../libraries/Icomoon';
 import { DataTable } from '../../../common/DataTable';
+import {createLeave} from '../../../common/Apis/hr/Leave';
+import LoadingBar from 'react-top-loading-bar'
 
 class Leaves extends React.Component {
     state={
         columnDataState:[],
         rowDataState:[],
         leaveData:[],
+        progress:''
     }
 
     componentDidMount () {
@@ -31,20 +34,19 @@ class Leaves extends React.Component {
             { id: 1, Type: 'Sick', Reason:'Suffering from Fever', Date:'20 Feb 2021', Time:'7.am', Approval:'Pending', By:'Jeni', Days:'02' },
             { id: 2, Type: 'Vacation', Reason:'Out of state', Date:'10 Feb 2021', Time:'9.am', Approval:'Approved', By:'John', Days:'04'},
         ]
-
         this.setState({columnDataState,rowDataState })
-        console.log('col',columnDataState,this.state.leaveData )
-
     }
 
     render() {
         return (
-            <Layout back="Admin" current="Leaves" >
-                <div className="screenHeight">
+            <Layout back="HR Management" current="Leaves" pageTitle="Leave Management">
+                <div className="container-fluid">
+                    <LoadingBar
+                        color='#DF5A14'
+                        progress={this.state.progress}
+                        onLoaderFinished={() => this.setState({progress:100})}
+                    />
                     {this.renderLeaves()}
-                    <div className="d-flex justify-content-end">
-                        <ApplyLeave/>
-                    </div>
                 </div>
             </Layout>
         )
@@ -54,8 +56,8 @@ class Leaves extends React.Component {
 
     renderLeaves() {
         return(
-            <div className="container-fluid">
-                <div className="row mx-3">
+            <>
+                <div className="row mx-3 ">
                     <div className="border col-md-3 bg-white rounded border-secondary d-flex justify-content-between py-2 mx-3">
                         <input type="search" className="no-outline input-style smallText"
                             placeholder="Type, Date, Time..."
@@ -64,16 +66,15 @@ class Leaves extends React.Component {
                     </div>      
                 </div>
                 <div className="row mx-3">
-                    <div className="col-md-8 my-3">
+                    <div className="col-md-8 mt-3">
                         {this.renderDataTable()}
                     </div>
-                    <div className="col-md-4 my-3">
+                    <div className="col-md-4 mt-3">
                         {this.renderLeaveDetails()}
                         {this.renderCreateLeave()}
                     </div>
                 </div> 
-
-            </div>       
+            </>       
         )    
     }
 
@@ -81,7 +82,7 @@ class Leaves extends React.Component {
 
     renderDataTable() {
         return(
-            <div className="col-md-12 bg-white p-4 borderStyle">
+            <div className="col-md-12 bg-white px-3 py-2 borderStyle">
                 <DataTable
                     columnData={this.state.columnDataState}
                     rowData={this.state.rowDataState}
@@ -108,14 +109,17 @@ class Leaves extends React.Component {
                     </div>
                 </div>
                 <div className="px-3">
-                    <ThemeButton type="button" wrapperClass="btn col-md-12 themeActiveColor text-white fontStyle normalText" label="View Employees Leaves" onClick={()=> this.props.history.replace('/employeeLeave')} />
+                    <ThemeButton type="button" wrapperClass="btn themeActiveColor text-white col-md-12 fontStyle mt-3 py-2 smallText" label="View Employees Leaves" onClick={()=> this.props.history.replace('/employeeLeave')} />
                 </div>
             </div>
         ) 
     }
+
+    // Render  Create leave function
+
     renderCreateLeave() {
         return(
-            <div className="borderStyle bg-white my-3 p-3">
+            <div className="borderStyle bg-white mt-3 p-3">
                 <p className="normalText themeActiveFont text-center font-weight-bold">Create Leave</p>
                 <form onSubmit={this.onSubmitCreateLeave}>
                     <div className="my-3 px-3">
@@ -129,20 +133,54 @@ class Leaves extends React.Component {
                                     createLeaveErr: '',
                                 })
                             }
+                            error
                         />
-                        <ThemeButton type="submit" wrapperClass="btn col-md-12 text-white fontStyle normalText mt-3" label="Save"/>
+                        <ThemeButton type="submit" wrapperClass="btn themeActiveColor text-white col-md-12 fontStyle mt-3 py-2 smallText" label="Save"/>
                     </div>
                 </form>
             </div>
         ) 
-
     }
-    onSubmitCreateLeave= (e) =>{
-        console.log('here');
+    // Validation for job title
+    validateCreateLeave = () => {
+        const createLeaveError = CheckUserName(this.state.createLeave);
+        if (createLeaveError === 1) {
+            this.setState({ createLeaveErr: 'Job title empty' });
+            return false;
+        } else if (createLeaveError === 2) {
+            this.setState({ createLeaveErr: 'Invalid job title' });
+            return false;
+        } else return true;
+    };
+
+    // Empty leave input validation 
+    ValidateAllCreateLeave = ( ) => {
+        const createLeaveInput = this.validateCreateLeave();
+        if (createLeaveInput) {
+            return true;
+        } else {
+            return false;   
+        }
+    }
+
+    // onsubmit function for Create leave
+    onSubmitCreateLeave= async(e) =>{
         e.preventDefault();
         const allValidation = this.ValidateAllCreateLeave()
         if (allValidation) {
-            alert('Leave created Successfully! ')
+            let requestBody = {
+                createLeave: this.state.createLeave,
+            };
+            let result = false
+            result = await createLeave(requestBody);
+            this.setState({
+                progress:100
+                // error:result.errorCode ? result.errorCode : result.message
+            });
+            if (result && result.status) {
+                alert('Leave created Successfully! ')
+                this.props.history.push('/leave');
+            }
         } 
     }
 }

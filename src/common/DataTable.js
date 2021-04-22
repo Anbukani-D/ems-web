@@ -1,3 +1,5 @@
+// Data table 
+
 import React from 'react';
 import '../css/dataTable.css'
 import { DataGrid } from '@material-ui/data-grid';

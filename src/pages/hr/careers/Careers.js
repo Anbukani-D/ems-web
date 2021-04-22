@@ -5,18 +5,15 @@ import React from 'react';
 import "../../../css/common.css";
 import {Link} from 'react-router-dom'; 
 import {Layout, ThemeButton, CustomSelect} from "../../../common/Components";
-import ApplyLeave from '../../general/ApplyLeave';
 import { jobTypeOptions, specializationOptions, locationOptions } from '../../../common/DropDownList';
 import moment from 'moment';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
 import CreateJobPost from './CreateJobPost'
 import TablePagination from '@material-ui/core/TablePagination';
-import Icomoon from '../../../libraries/Icomoon'
-import Paper from '@material-ui/core/Paper';
-import InputBase from '@material-ui/core/InputBase';
-
+import Icomoon from '../../../libraries/Icomoon' 
+import {createCareer} from '../../../common/Apis/hr/Career';
+import LoadingBar from 'react-top-loading-bar'
 
 class Careers extends React.Component {
 
@@ -25,8 +22,10 @@ class Careers extends React.Component {
         location:'',
         specialization:'',
         jobType:'',
-        jobContent:[]
+        jobContent:[],
+        progress:''
     }
+
     componentDidMount() {
 		let jobContent = [
 			{
@@ -71,27 +70,26 @@ class Careers extends React.Component {
 
     render() {
         return (
-            <Layout back="Admin" current="Careers">
-                <div className="container-fluid">
-                    <div className="row mx-2">
-                        <div className="border col-md-3 bg-white rounded border-secondary d-flex justify-content-between py-2 ml-0">
+            <Layout back="HR Management" current="Career" pageTitle="Career">
+                <LoadingBar
+                    color='#DF5A14'
+                    progress={this.state.progress}
+                    onLoaderFinished={() => this.setState({progress:100})}
+                />
+                <div className="container-fluid py-0 my-0">
+                    <div className="row mx-2  py-0 my-0">
+                        <div className="border col-md-3 bg-white rounded border-secondary d-flex justify-content-between py-2">
                             <input type="search" className="no-outline input-style smallText"
                                 placeholder="Job Title, Skills, or Keywords..."
                             />
                             <Icomoon className="align-self-center" icon="search" size={15}/>
                         </div>                             
                         <CreateJobPost/>
-                    </div>
-                    
-                           
-                    <div className="mx-1  mt-3 row">
+                    </div>   
+                    <div className="mx-1 mt-1 row">
                         {this.renderCareers()}
                         {this.renderCareerContent()}
                     </div>
-                        <div className="d-flex justify-content-end">
-                            <ApplyLeave/>
-                        </div>
-                    
                 </div>          
             </Layout>
         )
@@ -101,7 +99,7 @@ class Careers extends React.Component {
 
     renderCareers() {
         return(
-            <div className="col-md-3 bg-white p-4 borderStyle">
+            <div className="col-md-3 bg-white p-4 mx-2 borderStyle my-2">
                 <form onSubmit={this.onSubmitApplyJob}>
                     <p className="xSmallText">Narrow your results</p>
                     <p className="themeActiveFont" style={{cursor:'pointer'}}>Clear</p>
@@ -117,7 +115,7 @@ class Careers extends React.Component {
                             placeholder="Location*"
                             value={this.state.location}
                             options ={locationOptions}
-                            onChange = {this.locationHandleChange}
+                            onChange = {(e)=>this.setState({location:e.target.value})}
                         />
                     </div>
                     <div className="mt-3">
@@ -125,7 +123,7 @@ class Careers extends React.Component {
                             placeholder="Specialization*"
                             value={this.state.specialization}
                             options ={specializationOptions}
-                            onChange = {this.specializationHandleChange}
+                            onChange = {(e)=>this.setState({specialization:e.target.value})}
                         />
                     </div>
                     <div className="mt-3">
@@ -133,7 +131,7 @@ class Careers extends React.Component {
                             placeholder="Job Type*"
                             value={this.state.jobType}
                             options ={jobTypeOptions}
-                            onChange = {this.jobTypeHandleChange}
+                            onChange = {(e)=>this.setState({jobType:e.target.value})}
                         />
                     </div>
                     <div className="d-flex align-items-end">
@@ -143,17 +141,13 @@ class Careers extends React.Component {
             </div>
         )
     }
-       
+     
+    // Render career content
     renderCareerContent(){
         return(
             <>
-            <div className="col-md-8 borderStyle bg-white ml-4 p-3">
-                {/* <select name="sortby" id="sortby" placeholder="sort by">
-                    <option value="City">City</option>
-                    <option value="state">State</option>
-                    <option value="jobTitle">Job Title</option>
-                    <option value="company">Company</option>
-                </select> */}
+            <div className="col-md-8 borderStyle bg-white mx-2 p-3 my-2">
+                <div className="scrollStyle" style={{height:420}}>
                 {this.state.jobContent.map((jobContent) => (
                     <Link to="/careersDescription" className="text-decoration-none">
                         <div key={jobContent.id}>
@@ -165,19 +159,41 @@ class Careers extends React.Component {
                             <hr className="line"></hr>
                         </div>  
                     </Link>
-                    
                 ))
                 }
+                </div>
                 <div className="d-flex justify-content-between">
                     <p className="normalText text-uppercase pt-3">EXPORT AS: <span className="themeActiveFont" style={{cursor:'pointer'}}>CSV</span></p>
-                    <TablePaginationDemo/>
-                </div>
-                
+                    <Pagination/>
+                </div>  
             </div>
             </>
         )
     }
 
+    onSubmitApplyJob = async(e)=>{
+        console.log('here hello')
+        e.preventDefault();
+        const allValidation = this.ValidateAllJobPost()
+            if (allValidation) {  
+                let requestBody = {
+                    location: this.state.location,
+                    specialization:this.state.specialization,
+                    jobType:this.state.jobType,
+                    
+                };
+            let result = false
+            result = await createCareer(requestBody);
+            
+            this.setState({progress:100,
+                // error:result.errorCode ? result.errorCode : result.message
+            });
+            if (result && result.status) {
+                this.props.history.push('/career');
+            } 
+        }       
+    }
+   
     // Handle change function for location
     
     locationHandleChange = location => {
@@ -196,31 +212,31 @@ class Careers extends React.Component {
     }
 }
     
+    // Render pagination
+    function Pagination() {
+        const [page, setPage] = React.useState(2);
+        const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
- function TablePaginationDemo() {
-  const [page, setPage] = React.useState(2);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const handleChangePage = (event, newPage) => {
+            setPage(newPage);
+    };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+    const handleChangeRowsPerPage = (event) => {
+            setRowsPerPage(parseInt(event.target.value, 10));
+            setPage(0);
+    };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  return (
-    <TablePagination
-        component='div'
-        count={100}
-        page={page}
-        onChangePage={handleChangePage}
-        rowsPerPage={rowsPerPage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
-    />
-  );
-}
+    return (
+            <TablePagination
+                component='div'
+                count={100}
+                page={page}
+                onChangePage={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
+        );
+    }
 
     
     

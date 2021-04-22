@@ -3,7 +3,7 @@
     width:1440px !important;
 }
 .screenHeight {
-    min-height: 820px !important;
+    min-height: 800px !important;
 }
 .themeBgColor {
     background-color: #F69A6A4A !important;
@@ -19,7 +19,7 @@
     color:#F69A6A;
 }
 .fontStyle {
-    font-family: 'Montserrat', sans-serif bold !important;
+    font-family: 'Montserrat', sans-serif !important;
 }
 .loginBgColor {
     background-color: #F69A6A !important;
@@ -83,7 +83,6 @@
     
 }
 .bs-popover-auto[x-placement^=bottom]>.arrow, .bs-popover-bottom>.arrow {
-    left:110px !important; 
     color: aliceblue !important;
     border-color:#F69A6A !important;
 }
@@ -114,11 +113,90 @@ hr.line {
 .dashboardStyle {
     position: absolute !important;
     top: 150px !important;
-    left: 235px !important;
+    left: 265px !important;
 }
 
 .contentStyle {
     position: absolute !important;
-    left: 200px !important;
+    left: 235px !important;
     top: 200px !important;
 }
+
+.hideScroll {
+    overflow-y: 0 !important;
+}
+
+/* Switch style */
+.MuiSwitch-colorSecondary.Mui-checked{
+    color:#DF5A14 !important;
+}
+
+.MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track {
+    background-color: #DF5A14 !important;
+}
+
+.MuiAppBar-colorPrimary {
+    background-color: transparent !important;
+}
+.MuiPaper-elevation4 {
+    box-shadow: none !important;
+}
+
+
+.MuiTreeItem-root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label{
+    color: #DF5A14 !important;
+}
+
+.MuiTypography-body1{
+    /* font-family: none !important; */
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: bolder !important;
+}
+
+.MuiTreeItem-label:hover{
+    background-color: transparent !important;
+}
+.MuiFab-root {
+    background-color: #DF5A14 !important;
+}
+.MuiLinearProgress-barColorPrimary{
+    background-color: #DF5A14 !important;
+}
+.MuiLinearProgress-colorPrimary{
+    background-color: #F69A6A4A !important;
+}
+.MuiLinearProgress-root{
+    height: 6px !important;
+}
+.toast-body {
+   border: 2px solid #F69A6A !important
+}
+.transparentBgColor{
+    background-color: transparent !important;
+}
+.underLineStyle {
+    border-bottom: 3px solid #DF5A14;
+}
+ .border-bottom.colorBorder {
+    border-bottom: 1px solid #F69A6A !important;
+}
+.table td, .table th {
+    padding: .15rem !important;
+}
+
+/** Cursor style **/
+.pointer {
+    cursor:'pointer' !important
+}
+
+/* *Custom input box style*/
+/* .MuiFormLabel-root.Mui-focused {
+    color:#F69A6A !important;
+} 
+.MuiInput-underline:after {
+    border-bottom: 2px solid #F69A6A !important
+} */
+
+
+

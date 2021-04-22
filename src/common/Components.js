@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React,{useRef,useState} from 'react';
 import "../css/common.css";
 import "../css/menu.css";
 import {
@@ -8,7 +8,7 @@ import {
   } from '@material-ui/core/styles';
 import { orange } from '@material-ui/core/colors';
 import Icomoon from "../libraries/Icomoon";
-import LeftMenu from '../common/menus/LeftMenu';
+// import LeftMenu from '../common/menus/LeftMenu';
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
@@ -19,19 +19,13 @@ import InputLabel from "@material-ui/core/InputLabel";
 import { Select, FormControl, TextField } from "@material-ui/core";
 import "date-fns";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Tooltip from 'react-bootstrap/Tooltip'
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import Spinner from "react-bootstrap/Spinner";
-import { Route, Redirect, useLocation } from "react-router-dom";
-import Modal from "react-bootstrap/Modal";
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-
+import LeftMenu from './sidebar/LeftMenu';
+import ApplyLeave from '../pages/general/ApplyLeave';
+import Overlay from "react-bootstrap/Overlay";
+import Fab from '@material-ui/core/Fab';
+import Alert from 'react-bootstrap/Alert';
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -54,50 +48,18 @@ const useStyles = makeStyles((theme) => ({
 
 // Render layout
 export const Layout = (props) => {
-    let {back, current, pageTitle} = props;
-    return <LeftMenu children={props.children}  />;
-};
-
-
-// Render breadcrumb 
-export const BreadCrumb = props => {
-	let {back, current} = props;
-	return (
-		<div className="col-md-12 row">
-			<Icomoon icon="arrow" size={20} className="align-self-center mb-3" onClick={()=> this.props.history.goBack()}/>
-			<nav aria-label="breadcrumb">
-				<ol className="breadcrumb">
-					<li className="breadcrumb-item"><a className="text-secondary" href="#" >{back}</a></li>
-					<li className="breadcrumb-item active" aria-current="page">{current}</li>
-				</ol>
-			</nav>
-		</div>
-	)
-}
-
-
-
-// Render custom button
-export const CustomButton  = props => {
-    let {label, buttonFontColor, ...rest } = props;
     return (
-        <button className="btn loginBgColor py-3 megaText font-weight-bold col-md-12" {...rest}>
-            {label}
-        </button>
-    );
+       <LeftMenu children={props.children} back={props.back} current={props.current} pageTitle={props.pageTitle} /> );
 };
-
-
-
-
 
 // Render Theme button
 export const ThemeButton = props => {
     let {
-		className = "btn", 
+		className , 
         wrapperClass,
         fieldClass,
         label,
+        loading,
         ...rest
     } = props;
     wrapperClass = wrapperClass ? wrapperClass : "";
@@ -107,6 +69,7 @@ export const ThemeButton = props => {
     }
     if (props.loading) {
         return (
+            <>
             <button
                 className={wrapperClass}
                 type="button"
@@ -120,13 +83,14 @@ export const ThemeButton = props => {
                 ></span>
 				<span className="smallText">Loading</span>
             </button>
+            </>
         );
     } else {
         return (
             <button
                 type="submit"
                 className={wrapperClass}
-				{...rest}
+				{...rest}   
             >
                 {label}
             </button>
@@ -139,67 +103,109 @@ export const ThemeButton = props => {
 
 export const CustomInput  = props => {
   const classes = useStyles();
-	let {placeholder, id, fieldStyle, customError, rightIcon, inputColor, iconName, iconSize, iconColor,  ...rest } = props;
+	let {placeholder, id, fieldStyle, customError, rightIcon, inputColor, iconName, iconSize, iconColor, error,  ...rest } = props;
         return (	
 			<ThemeProvider theme={theme}>
 				<TextField 
-					className={+classes.margin, "col-md-12 fontStyle"}  
+					className={classes.margin + " col-md-12 fontStyle"}  
 					id={id} 
 					label={placeholder} 
 					variant={fieldStyle} 
 					color={inputColor} 
 					endAdornment={rightIcon}
+                    error={error ? customError: placeholder }
 					{...rest}
 					InputProps={{
 						endAdornment: <Icomoon icon={iconName} size={iconSize} color={iconColor}/>
 						}}
 				/>  
-				{customError ? (
+				{/* {customError ? (
                 <small className="smallText text-danger">
                     {customError}
                 </small>
-            ) : null}
+            ) : null} */}
 			</ThemeProvider>  
 			
         );
     };
+    
+// Render custom select
 
-export const CustomSelect = props => {
-    const classes = useStyles();
-	let {placeholder, wapperClass, id,  fieldClass, customError,options,  ...rest } = props;
-	wapperClass = wapperClass ? wapperClass : "";
-	fieldClass = fieldClass ? fieldClass : "";
-	const fillData = () => {
-		var rows = [];
-		rows.push(<option aria-label="None" value="" />);
-		if (options) {
-			for (const [index, value] of options.entries()) {
-				rows.push(<option key={index}>{value.label}</option>);
-			}
-			return <>{rows}</>;
-		} else {
-			return null;
-		}
-	};
-	return (
-		<FormControl className="w-100">
-            <ThemeProvider theme={theme}>
-			    <InputLabel id="demo-simple-select-readonly-label normalText">{placeholder}</InputLabel>
-                <Select native >{fillData()}</Select>
-                {customError ? (
-                    <small className="smallText text-danger">
-                        {customError}
-                    </small>
-                ) : null}
-            </ThemeProvider>
-      	</FormControl>
-	)
-}
+// export const CustomSelect = props => {
+// 	let {placeholder, customError, options, error,id, ...rest} = props;
+	
+// 	const fillData = () => {
+// 		var rows = [];
+// 		rows.push(<option aria-label="None" value="" />);
+// 		if (options) {
+// 			for (const [index, value] of options.entries()) {
+// 				rows.push(<option key={index}>{value.label}</option>);
+// 			}
+// 			return <>{rows}</>;
+// 		} else {
+// 			return null;
+// 		}
+// 	};
+// 	return (
+// 		<FormControl className="w-100">
+//             <ThemeProvider theme={theme}>
+// 			    <InputLabel id="demo-simple-select-readonly-label normalText">{placeholder}</InputLabel>
+//                     <Select native  
+//                         {...rest}
+//                         inputProps={{
+//                             id: 'name-native-error',
+//                         }}
 
+//                         // error={error ? customError: placeholder }
+//                         >{fillData()}
+//                     </Select>
+//             </ThemeProvider>
+//       	</FormControl>
+// 	)
+// }
+export const CustomSelect = (props) => {
+    let { wapperClass, fieldClass, error, placeholder, id, options, fieldStyle, ...rest } = props;
+    wapperClass = wapperClass ? wapperClass : "";
+    fieldClass = fieldClass ? fieldClass : "";
+    const fillData = () => {
+        var rows = [];
+        rows.push(<option aria-label="None"  value="" />);
+        if (options) {
+            for (const [index, value] of options.entries()) {
+                rows.push(<option key={index}>{value.label}</option>);
+            }
+            return <>{rows}</>;
+        } else {
+            return null;
+        }
+    };
+    return (
+        <>
+            <FormControl  className={wapperClass + "w-100"}  variant={fieldStyle}>
+                <InputLabel  htmlFor={id ? id : null}>{placeholder}</InputLabel>
+                <Select 
+                    native 
+                    {...rest}
+                    inputProps={{
+                        id: 'name-native-error',
+                    }}
+                    >{fillData()}</Select>
+            </FormControl>
+            
+            {error ? (
+                <small className="form-text xSmallText text-danger">
+                    {error}
+                </small>
+            ) : null}
+            {/*error={error ? customError: placeholder }*/}
+        </>
+    );
+  };
 // Render custom date picker
 
 export const CustomDatePicker = (props) => {
     let {
+        error,
         wrapperClass,
         fieldClass,
         customError,
@@ -233,135 +239,33 @@ export const CustomDatePicker = (props) => {
                         }}
                         className="w-100"
                         {...rest}
+                        error={error ? customError: placeholder }
                     />
                 </Grid>
             </MuiPickersUtilsProvider>
-            {customError ? (
+            {/* {customError ? (
                 <small className="smallText text-danger">
                     {customError}
                 </small>
-            ) : null}
+            ) : null} */}
         </div>
     );
 };
 // Render custom ToolTip
 
 export const ToolTip = (props) => {
-    let { title, ...rest} = props;
+    let { title, direction, ...rest} = props;
 
     return (
         <OverlayTrigger
-            placement="bottom"
+            placement={direction}
             delay={{ show: 250, hide: 400 }}
-            overlay={<div className="text-dark smallText bg-white rounded borderStyle borderStyle">{title}</div>}
+            arrow
+            overlay={<span className="text-dark  smallText border borderColor p-1 mt-1 px-3 rounded">{title}</span>}
             {...rest}
         />   
     )
 }
-
-// Prograss bar function
-
-export function ProgressBar() {
-	const [progress, setProgress] = React.useState(0);
-  
-	React.useEffect(() => {
-	  const timer = setInterval(() => {
-		setProgress((oldProgress) => {
-		  if (oldProgress === 100) {
-			return 0;
-		  }
-		  const diff = Math.random() * 10;
-		  return Math.min(oldProgress + diff, 100);
-		});
-	  }, 500);
-  
-	  return () => {
-		clearInterval(timer);
-	  };
-	}, []);
-  
-	return (
-	  <div className="col-md-12">
-		<LinearProgress variant="determinate" 
-            value={progress}  
-            size={40}
-            thickness={4}
-            className="themeActiveColor"
-        />
-	  </div>
-	);
-  }
-
-  /**
- *
- * @param{props} route elements
- * @returns page route
- */
-export const PublicRoute = props => {
-    const [status, setStatus] = useState(false);
-    const [allow, setAllow] = useState(false);
-    const currentPath = useLocation();
-    const routes = ["/", "/login"];
-    if ( routes.includes(currentPath.pathname)) {
-        return <Redirect to="/dashboard" />;
-    }
-    // function UseEffectDidMount() {
-    //     useEffect(() => {
-    //         if (!Config.reHydrate && !AppConfig.api_key && !status) {
-    //             setStatus(true);
-    //             init().then((response) => {
-    //                 if (response && response.status) {
-    //                     setStatus(false);
-    //                     setAllow(true);
-    //                 }
-    //             });
-    //         } else if (AppConfig.api_key) {
-    //             setAllow(true);
-    //         }
-    //     }, []);
-    //     return null;
-    // }
-    function pageLoader() {
-        if (status) {
-            return (
-                <Modal id="routeLoader" show={status}>
-                    <Spinner animation="border" variant="success" role="status">
-                        <span className="sr-only">Loading</span>
-                    </Spinner>
-                </Modal>
-            );
-        } else {
-            return null;
-        }
-    }
-    return (
-        <>
-            {/* <UseEffectDidMount /> */}
-            {allow ? <Route {...props} /> : null}
-            {pageLoader()}
-        </>
-    );
-}
-
-/**
- *
- * @param {*} route elements
- * @returns square page route
- */
-export const PrivateRoute = ({ component: Component, ...props }) => {
-    return (
-        <Route
-            {...props}
-            render={(props) =>
-                // AppConfig.authorization !== "" ? (
-                //     <Component {...props} />
-                // ) : (
-                    <Redirect to="/login" />
-                // )
-            }
-        />
-    );
-};
 
 export const CustomSwitch = (props) => {
     let {
@@ -373,13 +277,78 @@ export const CustomSwitch = (props) => {
     return (
         <FormControlLabel
            {...rest}
-            control={<Switch color= "warning" />}
+            control={<Switch/>}
             label={label}
             labelPlacement="start"
-            // className={ wrapperClass }
         />
     )
 }
+
+// export const CustomToastMessage = (props) =>{
+//     let {content} = props;
+//     const [show, setShow] = useState(false);
+  
+//     return (
+//       <Row>
+//         <Col xs={6}>
+//           <Toast onClose={() => setShow(false)} show={show} delay={3000} autohide>
+            
+//             <Toast.Body>{content}</Toast.Body>
+//           </Toast>
+//         </Col>
+//         <Col xs={6}>
+//           <ThemeButton onClick={() => setShow(true)} label="Submit"/>
+//         </Col>
+//       </Row>
+//     );
+//   }
+
+/*-------------------------
+Apply leave function
+---------------------------*/
+export default function ApplyLeaveButton() {
+    const [show, setShow] = useState(false);
+    const [target, setTarget] = useState(null);
+    const ref = useRef(null);
+    
+    const handleClick = (event) => {
+        setShow(!show);
+        setTarget(event.target);
+    };
+    
+    return (
+        <>
+            <div ref={ref}> 
+                <>
+                    <ToolTip direction="top" title="Apply Leave"> 
+                        <Fab>
+                            <Icomoon style={{cursor:'pointer'}} icon="floatBtn" size={50} onClick={handleClick}/>
+                        </Fab>
+                    </ToolTip>
+                </>
+                <Overlay
+                    show={show}
+                    target={target}
+                    placement="top"
+                    container={ref.current}
+                    containerPadding={20}
+                >
+                    <Alert className="col-md-3 borderStyle  borderColor bg-white p-3" id="popover-contained">
+                        <div className="d-flex justify-content-between">
+                            <p className="smallText font-weight-bold">Apply Leave</p>
+                            <Icomoon icon="cirBtn" size={50} style={{cursor:'pointer'}} onClick={handleClick} />
+                        </div>
+                        <ApplyLeave/>
+                    </Alert>
+                </Overlay>
+            </div>
+        </>
+    );
+}
+
+
+
+  
 
 
 

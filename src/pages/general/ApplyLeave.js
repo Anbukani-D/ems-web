@@ -3,11 +3,10 @@
 
 import React from 'react';
 import "../../css/common.css";
-import Icomoon from "../../libraries/Icomoon";
-import {CustomSelect, CustomDatePicker, CustomInput, ToolTip, ThemeButton} from "../../common/Components";
-import Alert from 'react-bootstrap/Alert'
+import {CustomSelect, CustomDatePicker, CustomInput, ThemeButton} from "../../common/Components";
 import {CheckUserName, CheckPhone, DropDownCheck, CheckDob} from "../../common/Validation";
 import {leaveTypeOptions,sessionTypeOptions } from '../../common/DropDownList'
+import { applyLeave } from '../../common/Apis/hr/Leave';
 
 class ApplyLeave extends React.Component {
     state={
@@ -18,49 +17,40 @@ class ApplyLeave extends React.Component {
         toSession:'',
         reason:'',
         contactNumber:'',
-        showPopup:false,
-        target:null,
+        show:false,
+        target:false,
         ref:null,
-
-
+        current:null,
+        progress:'',
+        loading:false
     }
     render(){
-        console.log('kjhjk')
         return(
             <>
-                { !this.state.showPopup &&
-                <>
-                <ToolTip title="Apply Leave"> 
-                    <Icomoon style={{cursor:'pointer'}} icon="floatBtn" size={50} onClick={()=>{this.setState({showPopup:true})}}/>
-                </ToolTip>
-                    </>
-                }
-            {this.renderApplyLeave()}
+                {this.renderApplyLeave()}  
             </>
-
+                    
         )
     }
 
+    // Render Apply leave 
     renderApplyLeave() {
-        return(
-            <Alert className="col-md-4  borderStyle  borderColor bg-white" show={this.state.showPopup} >
-                <div className="d-flex justify-content-between">
-                    <p className="smallText font-weight-bold">Apply Leave</p>
-                    <Icomoon icon="cirBtn" size={30} onClick={()=>this.setState({showPopup:false})}/>
-                </div>
+        return(    
+            <div>   
                 <form onSubmit={this.onSubmitApplyLeave}>
                     <div className="mt-2">
                         <CustomSelect
                             placeholder="Type of Leave*"
                             value={this.state.typeOfLeave}
                             options ={leaveTypeOptions}
-                            onChange = {this.leaveTypeHandleChange}
+                            onChange={(e)=>this.setState({typeOfLeave:e.target.value})}
                             customError={this.state.typeOfLeaveErr}
                             onFocus={() =>
                                 this.setState({
                                     typeOfLeaveErr: '',
                                 })
                             }
+                            error
                         />
                     </div>
                     <div className="row">
@@ -80,6 +70,7 @@ class ApplyLeave extends React.Component {
                                             fromDateErr: '',
                                         })
                                     }
+                                    error
                                 />
                             </div>
                             <div>
@@ -97,6 +88,7 @@ class ApplyLeave extends React.Component {
                                             toDateErr: '',
                                         })
                                     }
+                                    error
                                 />
                             </div>
                         </div>
@@ -106,26 +98,28 @@ class ApplyLeave extends React.Component {
                                     placeholder="From Session*"
                                     value={this.state.fromSession}
                                     options ={sessionTypeOptions}
-                                    onChange = {this.fromSessionHandleChange}
+                                    onChange={(e)=>this.setState({fromSession:e.target.value})}
                                     customError={this.state.fromSessionErr}
                                     onFocus={() =>
                                         this.setState({
                                             fromSessionErr: '',
                                         })
                                     }
+                                    error
                                     
                                 />
                                 <CustomSelect
                                     placeholder="To Session*"
                                     value={this.state.toSession}
                                     options ={sessionTypeOptions}
-                                    onChange = {this.toSessionHandleChange}
+                                    onChange={(e)=>this.setState({toSession:e.target.value})}
                                     customError={this.state.toSessionErr}
                                     onFocus={() =>
                                         this.setState({
                                             toSessionErr: '',
                                         })
                                     }
+                                    error
                                 />
                             </div>
                         </div>
@@ -144,15 +138,17 @@ class ApplyLeave extends React.Component {
                                     reasonErr: '',
                                 })
                             }
+                            error
                         />
                     </div>
                     <div className="mt-2">
                         <CustomSelect
                             placeholder="Approval"
-                            // value={this.state.approval}
-                            // options ={leaveTypeOptions}
-                            // onChange = {this.leaveTypeHandleChange}
-                            // customError={this.state.approvalErr}
+                            value={this.state.approval}
+                            options ={leaveTypeOptions}
+                            onChange={(e)=>this.setState({approval:e.target.value})}
+                            customError={this.state.approvalErr}
+                            error
                         />
                     </div>
                     <div className="mt-2">
@@ -166,11 +162,26 @@ class ApplyLeave extends React.Component {
                                     contactNumberErr: '',
                                 })
                             }
+                            error
                         />
                     </div>
+                    { this.state.loading ?
+                    <>
+                    <span
+                        className="spinner-border spinner-border-sm themeActiveFont"
+                        role="status"
+                        aria-hidden="false"
+                        loading="false"
+                    >
+                    </span>
+                    <span className="smallText themeActiveFont">Loading</span>
+                    </>
+                    :
+                    null
+                    }
                     <ThemeButton type="submit" wrapperClass="btn themeActiveColor col-md-12 text-white fontStyle normalText mt-3" label="Apply Leave"/> 
                 </form> 
-            </Alert>
+            </div>
         )
     }
     
@@ -283,12 +294,28 @@ class ApplyLeave extends React.Component {
 
     // onsubmit function for apply leave inputs
 
-    onSubmitApplyLeave = (e) =>{
-        console.log('here');
+    onSubmitApplyLeave = async(e) =>{
         e.preventDefault();
         const allValidation = this.ValidateAllApplyLeave()
         if (allValidation) {
-            alert('Leave Applied Successfully! ')
+            let requestBody = {
+                typeOfLeave: this.state.typeOfLeave,
+                fromDate:this.state.fromDate,
+                toDate:this.state.toDate,
+                fromSession:this.state.fromSession,
+                toSession:this.state.toSession,
+                reason:this.state.reason,
+                contactNumber:this.state.contactNumber,
+            };
+            let result = false
+            result = await applyLeave(requestBody);
+            this.setState({
+                // error:result.errorCode ? result.errorCode : result.message
+            });
+            if (result && result.status) {
+                alert('Leave Applied Successfully! ')
+                this.props.history.push('/employeeProfile');
+            }
         } 
     }
 
@@ -297,52 +324,9 @@ class ApplyLeave extends React.Component {
 export default ApplyLeave;
 
 
-// export default function ApplyLeave() {
-//     const [show, setShow] = useState(false);
-//     const [target, setTarget] = useState(null);
-//     const ref = useRef(null);
-  
-//     const handleClick = (event) => {
-//       setShow(!show);
-//       setTarget(event.target);
-//     };
-  
-//     return (
-//       <div ref={ref}>
-//         <Icomoon icon="floatBtn" size={50}  onClick={handleClick}/>
-//         <Overlay
-//           show={show}
-//           target={target}
-//           placement={"top","left"}
-//           container={ref.current}
-//           containerPadding={20}
-//         >
-//         <Popover className="col-md-4  borderStyle  borderColor">
-//                 <div className="col-md-12 p-3">
-//                     <div className="d-flex justify-content-between">
-//                         <p className="smallText font-weight-bold">Apply Leave</p>
-//                         <div className="">
-//                             <Icomoon icon="bell" size={20}/>
-//                         </div>
-//                         <Icomoon icon="cirBtn" size={30}/>
-                    
-//                     </div>
-//                     <div className="mt-2">
-//                         <CustomSelect
-//                             className="smallText"
-//                             placeholder="Department*"
-                           
-//                             options ={leaveTypeOptions}
-//                             // onChange = {this.leaveTypeHandleChange}
-//                             // customError={this.state.typeOfLeaveErr}
-//                         />
-//                     </div>
-//             </div>
-//             </Popover>
-//         </Overlay>
-//       </div>
-//     );
-//   }
+
+
+
   
 
 

@@ -3,22 +3,22 @@
 
 import React from 'react';
 import "../../../css/common.css";
+import "../../../css/calendar.css";
 import { Layout } from '../../../common/Components';
-import ApplyLeave from '../../general/ApplyLeave';
 import CreateHoliday from './CreateHoliday';
-
+import EventCalendar from '../events/EventCalendar';
 
 class Events extends React.Component {
     state={
         events:[]
     }
+    
     componentDidMount() {
 		let events = [
 			{
                 id: 1,
                 events:'Makara Shankranthi',
-                date: '14 Jan, 2021',
-				
+                date: '14 Jan, 2021',	
 			},
 			{
                 id: 2,
@@ -77,13 +77,8 @@ class Events extends React.Component {
 
     render() {
         return (
-            <Layout back="Admin" current="Events"  pageTitle="Events" >
-                <div className="pr-3">
-                    {this.renderEvents()}
-                    <div className="d-flex justify-content-end">
-                        <ApplyLeave/>
-                    </div>
-                </div>
+            <Layout back="Admin" current="Events"  pageTitle="Events">
+                {this.renderEvents()}
             </Layout>
         )
     }
@@ -92,19 +87,19 @@ class Events extends React.Component {
 
     renderEvents() {
         return(
-            <div className="container-fluid">
-                <div className="m-3">
+            <>
+                <div className="mx-3">
                     <CreateHoliday/>
                 </div>
-                <div className="row m-3">
-                    <div className="col-md-9 mb-3">
+                <div className="d-flex justify-content-between mx-3 my-2">
+                    <div className="col-md-8 mb-3">
                         {this.renderCalendar()}
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-4">
                         {this.renderUpcomingEvents()}
                     </div>
                 </div> 
-            </div>
+            </>
         )    
     }
 
@@ -112,6 +107,7 @@ class Events extends React.Component {
     renderCalendar () {
         return(
             <>
+                <EventCalendar/>
             </>
         )
     }
@@ -119,20 +115,18 @@ class Events extends React.Component {
     // Render upcoming events function
     renderUpcomingEvents () {
         return(
-            <div className="bg-white p-4 borderStyle">
+            <div className="bg-white p-4 borderStyle scrollStyle" style={{height:480}}>
                 {this.state.events.map((events) => (
-                <div key={events.id}>
-                    <p className="smallText themeActiveFont">{events.events}
-                    <span className="xSmallText themeActiveFont"><br/>{events.date}</span> </p>
-                </div>
+                    <div key={events.id}>
+                        <p className="smallText themeActiveFont">{events.events}
+                        <span className="xSmallText themeActiveFont"><br/>{events.date}</span></p>
+                    </div>
                 ))}
-            
             </div>
-        
         )
-    }
-    
+    }   
 }
+
 export default Events;
 
     

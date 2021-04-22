@@ -1,3 +1,5 @@
+// Notiofication popup data
+
 import React from 'react';
 import '../../css/common.css';
 import moment from 'moment';
@@ -46,7 +48,7 @@ class Notification extends React.Component{
                     {this.state.notifications.map((notifications) => (
                         <div className="bg-light my-2 p-2" key={notifications.id}>
                            <span className="themeActiveFont my-0">{notifications.title} </span>
-                            <p className="smallText my-0 py-0">{notifications.content}</p>
+                            <p className="smallText my-0 py-0 text-dark">{notifications.content}</p>
                             <p className="smallText themeActiveFont text-right my-0 py-0">{notifications.name}</p>
                             <div className='d-flex justify-content-between'>
                                 <p className="xSmallText themeActiveFont">{moment(notifications.date).format('DD-MM-YYYY HH:mm:ss a')}</p>
